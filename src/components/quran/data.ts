@@ -63,3 +63,54 @@ export const VIRTUES = [
     ref: "Ar-Ra'd 13:28",
   },
 ];
+
+export type AyahResult = {
+  surahNumber: number;
+  ayahNumber: number;
+  surahEnglish: string;
+  arabic: string;
+  urdu: string;
+};
+
+type SearchMatch = {
+  numberInSurah: number;
+  text: string;
+  surah: { number: number; englishName: string };
+};
+
+/** Urdu tarjuma me lafz talash karein, phir har match ki Arabic ayat laayein. */
+export async function searchAyat(keyword: string): Promise<AyahResult[]> {
+  const q = keyword.trim();
+  if (q.length < 2) return [];
+  const res = await fetch(
+    `https://api.alquran.cloud/v1/search/${encodeURIComponent(q)}/all/ur.jalandhry`,
+  );
+  if (!res.ok) return [];
+  const json = (await res.json()) as { data?: { matches?: SearchMatch[] } };
+  const matches = (json.data?.matches ?? []).slice(0, 15);
+
+  const withArabic = await Promise.all(
+    matches.map(async (m) => {
+      let arabic = "";
+      try {
+        const r = await fetch(
+          `https://api.alquran.cloud/v1/ayah/${m.surah.number}:${m.numberInSurah}/quran-uthmani`,
+        );
+        if (r.ok) {
+          const j = (await r.json()) as { data?: { text?: string } };
+          arabic = j.data?.text ?? "";
+        }
+      } catch {
+        arabic = "";
+      }
+      return {
+        surahNumber: m.surah.number,
+        ayahNumber: m.numberInSurah,
+        surahEnglish: m.surah.englishName,
+        arabic,
+        urdu: m.text,
+      };
+    }),
+  );
+  return withArabic;
+}
