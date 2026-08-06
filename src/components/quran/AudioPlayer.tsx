@@ -59,8 +59,8 @@ export function AudioPlayer({ surah, reciter, reciterName, onNext, onPrev }: Pro
             {surah.number}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-arabic text-lg leading-tight text-primary">{surah.name}</p>
-            <p className="truncate text-xs text-muted-foreground">
+            <p className="truncate font-arabic text-xl leading-tight text-primary">{surah.name}</p>
+            <p className="truncate text-sm text-muted-foreground">
               {surah.englishName} · {reciterName}
             </p>
           </div>
