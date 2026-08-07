@@ -223,14 +223,11 @@ function Home() {
             ))}
 
           {filtered.map((s) => {
-            const active = current?.number === s.number;
             return (
               <button
                 key={s.number}
                 onClick={() => setCurrent(s)}
-                className={`surface-card group flex items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all hover:-translate-y-1 ${
-                  active ? "ring-2 ring-primary" : ""
-                }`}
+                className="surface-card group flex items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all duration-300 hover:-translate-y-1 hover:ring-2 hover:ring-primary/60"
               >
                 <span className="flex h-11 w-11 shrink-0 rotate-45 items-center justify-center rounded-lg gold-border bg-secondary">
                   <span className="-rotate-45 text-sm text-primary">{s.number}</span>
