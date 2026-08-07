@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Play, BookOpen, Moon, Headphones, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-islamic.jpg";
-import { AudioPlayer } from "@/components/quran/AudioPlayer";
+import { NowPlaying } from "@/components/quran/NowPlaying";
 import { DAILY_DUAS, RECITERS, VIRTUES, fetchSurahs, type Surah } from "@/components/quran/data";
 import { VideoBg } from "@/components/quran/VideoBg";
 import { AyahSearch } from "@/components/quran/AyahSearch";
@@ -56,10 +56,25 @@ function Home() {
     if (next) setCurrent(next);
   };
 
-  const reciterName = RECITERS.find((r) => r.id === reciter)?.name ?? "";
+  const _reciterName = RECITERS.find((r) => r.id === reciter)?.name ?? "";
+
+
+  if (current) {
+    return (
+      <NowPlaying
+        surah={current}
+        reciter={reciter}
+        onReciterChange={setReciter}
+        onBack={() => setCurrent(null)}
+        onNext={() => step(1)}
+        onPrev={() => step(-1)}
+      />
+    );
+  }
 
   return (
-    <div className="min-h-screen arabesque pb-40">
+    <div className="min-h-screen arabesque pb-24">
+
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
@@ -208,14 +223,11 @@ function Home() {
             ))}
 
           {filtered.map((s) => {
-            const active = current?.number === s.number;
             return (
               <button
                 key={s.number}
                 onClick={() => setCurrent(s)}
-                className={`surface-card group flex items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all hover:-translate-y-1 ${
-                  active ? "ring-2 ring-primary" : ""
-                }`}
+                className="surface-card group flex items-center gap-4 rounded-2xl px-4 py-4 text-left transition-all duration-300 hover:-translate-y-1 hover:ring-2 hover:ring-primary/60"
               >
                 <span className="flex h-11 w-11 shrink-0 rotate-45 items-center justify-center rounded-lg gold-border bg-secondary">
                   <span className="-rotate-45 text-sm text-primary">{s.number}</span>
@@ -280,13 +292,6 @@ function Home() {
         </p>
       </footer>
 
-      <AudioPlayer
-        surah={current}
-        reciter={reciter}
-        reciterName={reciterName}
-        onNext={() => step(1)}
-        onPrev={() => step(-1)}
-      />
     </div>
   );
 }
