@@ -57,9 +57,24 @@ function Home() {
   };
 
   const reciterName = RECITERS.find((r) => r.id === reciter)?.name ?? "";
+  void reciterName;
+
+  if (current) {
+    return (
+      <NowPlaying
+        surah={current}
+        reciter={reciter}
+        onReciterChange={setReciter}
+        onBack={() => setCurrent(null)}
+        onNext={() => step(1)}
+        onPrev={() => step(-1)}
+      />
+    );
+  }
 
   return (
-    <div className="min-h-screen arabesque pb-40">
+    <div className="min-h-screen arabesque pb-24">
+
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
@@ -280,13 +295,6 @@ function Home() {
         </p>
       </footer>
 
-      <AudioPlayer
-        surah={current}
-        reciter={reciter}
-        reciterName={reciterName}
-        onNext={() => step(1)}
-        onPrev={() => step(-1)}
-      />
     </div>
   );
 }
