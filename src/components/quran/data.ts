@@ -114,3 +114,23 @@ export async function searchAyat(keyword: string): Promise<AyahResult[]> {
   );
   return withArabic;
 }
+
+export type AyahLine = { number: number; arabic: string; urdu: string };
+
+/** Ek surah ki poori ayaat (Arabic + Urdu tarjuma) laayein. */
+export async function fetchSurahText(surah: number): Promise<AyahLine[]> {
+  const res = await fetch(
+    `https://api.alquran.cloud/v1/surah/${surah}/editions/quran-uthmani,ur.jalandhry`,
+  );
+  if (!res.ok) throw new Error("Surah text load nahi ho saka");
+  const json = (await res.json()) as {
+    data: { ayahs: { numberInSurah: number; text: string }[] }[];
+  };
+  const ar = json.data[0]?.ayahs ?? [];
+  const ur = json.data[1]?.ayahs ?? [];
+  return ar.map((a, i) => ({
+    number: a.numberInSurah,
+    arabic: a.text,
+    urdu: ur[i]?.text ?? "",
+  }));
+}
