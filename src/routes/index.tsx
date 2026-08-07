@@ -56,8 +56,8 @@ function Home() {
     if (next) setCurrent(next);
   };
 
-  const reciterName = RECITERS.find((r) => r.id === reciter)?.name ?? "";
-  void reciterName;
+  const _reciterName = RECITERS.find((r) => r.id === reciter)?.name ?? "";
+
 
   if (current) {
     return (
