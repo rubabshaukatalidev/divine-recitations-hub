@@ -81,13 +81,13 @@ async function fetchAyah(ref: string): Promise<AyahData> {
 
 const pick = (arr: string[], not?: string) => {
   const pool = arr.filter((r) => r !== not);
-  return pool[Math.floor(Math.random() * pool.length)] ?? arr[0];
+  return pool[Math.floor(Math.random() * pool.length)] ?? arr[0] ?? "1:1";
 };
 
 /** Dil ke haal ke mutabiq ayat — "Ayat-e-Noor" */
 export function MoodAyat() {
-  const [mood, setMood] = useState<Mood>(MOODS[0]);
-  const [ref, setRef] = useState<string>(MOODS[0].refs[0]);
+  const [mood, setMood] = useState<Mood>(MOODS[0]!);
+  const [ref, setRef] = useState<string>(MOODS[0]!.refs[0]!);
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -248,7 +248,7 @@ function Tasbeeh() {
           }}
         />
         <span className="relative flex flex-col items-center">
-          <span className="font-arabic text-3xl text-primary">{DHIKR[i].ar}</span>
+          <span className="font-arabic text-3xl text-primary">{DHIKR[i]!.ar}</span>
           <span className="mt-2 text-4xl font-bold tabular-nums">{count}</span>
         </span>
       </button>
