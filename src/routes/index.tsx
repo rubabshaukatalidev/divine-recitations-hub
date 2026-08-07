@@ -6,7 +6,7 @@ import heroImage from "@/assets/hero-islamic.jpg";
 import { NowPlaying } from "@/components/quran/NowPlaying";
 import { DAILY_DUAS, RECITERS, VIRTUES, fetchSurahs, type Surah } from "@/components/quran/data";
 import { VideoBg } from "@/components/quran/VideoBg";
-import { AyahSearch } from "@/components/quran/AyahSearch";
+import { MoodAyat } from "@/components/quran/MoodAyat";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -87,7 +87,7 @@ function Home() {
               Surahs
             </a>
             <a href="#ayat" className="transition-colors hover:text-primary">
-              Ayat
+              Ayat-e-Noor
             </a>
             <a href="#fazail" className="transition-colors hover:text-primary">
               Fazail
