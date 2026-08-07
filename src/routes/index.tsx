@@ -180,21 +180,22 @@ function Home() {
         </div>
       </section>
 
-      {/* Ayat search */}
+      {/* Ayat-e-Noor: dil ke haal ke mutabiq ayat + tasbeeh */}
       <section id="ayat" className="relative overflow-hidden">
-        <VideoBg opacity={0.22} overlay="strong" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <VideoBg opacity={0.25} overlay="strong" video="particles" />
+        <div className="relative mx-auto max-w-4xl px-4 py-20 sm:px-6">
           <SectionTitle
-            icon={<Search className="h-4 w-4" />}
-            kicker="Ayat"
-            title="Ayat talash karein aur seekhein"
+            icon={<Sparkles className="h-4 w-4" />}
+            kicker="Ayat-e-Noor"
+            title="Aaj dil ka haal kya hai?"
           />
           <p className="mx-auto mt-4 max-w-2xl text-center text-base text-muted-foreground sm:text-lg">
-            Koi bhi lafz likhein — Arabic ayat Urdu tarjume ke sath saamne aa jayegi.
+            Apni kaifiyat chunein — Allah ka kalam usi haal ke mutabiq, tarjume aur awaz ke sath.
           </p>
-          <AyahSearch />
+          <MoodAyat />
         </div>
       </section>
+
 
       {/* Surah list */}
       <section id="surahs" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
