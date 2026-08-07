@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Play, BookOpen, Moon, Headphones, Sparkles } from "lucide-react";
 import heroImage from "@/assets/hero-islamic.jpg";
-import { AudioPlayer } from "@/components/quran/AudioPlayer";
+import { NowPlaying } from "@/components/quran/NowPlaying";
 import { DAILY_DUAS, RECITERS, VIRTUES, fetchSurahs, type Surah } from "@/components/quran/data";
 import { VideoBg } from "@/components/quran/VideoBg";
 import { AyahSearch } from "@/components/quran/AyahSearch";
