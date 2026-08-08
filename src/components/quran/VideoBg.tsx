@@ -52,7 +52,9 @@ export function VideoBg({
 
     // Performance: viewport se bahar jaye to pause, wapas aaye to resume
     const io = new IntersectionObserver(
-      ([entry]) => {
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
         if (entry.isIntersecting) tryPlay();
         else el.pause();
       },
