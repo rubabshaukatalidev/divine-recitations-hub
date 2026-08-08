@@ -1,9 +1,11 @@
 {
   "version": 1,
-  "asset_id": "da145d02-9326-4fa0-b80f-e13bfdb5f5be",
+  "asset_id": "5e18261f-bbb0-4dc8-9a5b-16c0f789689c",
   "project_id": "78ad8adb-9638-4a88-914f-b25d11b964a7",
-  "url": "/__l5e/assets-v1/da145d02-9326-4fa0-b80f-e13bfdb5f5be/navy-silk.mp4",
+  "url": "/__l5e/assets-v1/5e18261f-bbb0-4dc8-9a5b-16c0f789689c/navy-silk.mp4",
+  "r2_key": "a/v1/78ad8adb-9638-4a88-914f-b25d11b964a7/5e18261f-bbb0-4dc8-9a5b-16c0f789689c/navy-silk.mp4",
   "original_filename": "navy-silk.mp4",
-  "size": 8466783,
-  "created_at": "2026-08-07T05:39:53Z"
+  "size": 8466802,
+  "content_type": "video/mp4",
+  "created_at": "2026-08-08T04:32:19Z"
 }

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import calligraphy from "@/assets/quran-calligraphy.mp4.asset.json";
 import particles from "@/assets/navy-particles.mp4.asset.json";
 import silk from "@/assets/navy-silk.mp4.asset.json";
@@ -24,16 +25,65 @@ export function VideoBg({
   overlay = "soft",
   video = "calligraphy",
 }: Props) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+
+    // Mobile Safari/Chrome: muted DOM par set karna zaroori hai,
+    // warna autoplay block ho jata hai.
+    el.muted = true;
+    el.defaultMuted = true;
+    el.volume = 0;
+
+    const tryPlay = () => {
+      const p = el.play();
+      if (p) p.catch(() => {/* autoplay blocked — next interaction par dobara try hoga */});
+    };
+
+    if (el.readyState >= 2) tryPlay();
+    else el.addEventListener("canplay", tryPlay, { once: true });
+
+    // Agar browser ne autoplay block kiya to pehli user interaction par play
+    const onFirstTouch = () => tryPlay();
+    document.addEventListener("touchstart", onFirstTouch, { once: true, passive: true });
+    document.addEventListener("click", onFirstTouch, { once: true });
+
+    // Performance: viewport se bahar jaye to pause, wapas aaye to resume
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (entry.isIntersecting) tryPlay();
+        else el.pause();
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(el);
+
+    return () => {
+      el.removeEventListener("canplay", tryPlay);
+      document.removeEventListener("touchstart", onFirstTouch);
+      document.removeEventListener("click", onFirstTouch);
+      io.disconnect();
+    };
+  }, [video]);
+
   return (
     <div className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`} aria-hidden>
       <video
         key={video}
+        ref={videoRef}
         src={BG_VIDEOS[video]}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
+        disablePictureInPicture
+        controls={false}
+        tabIndex={-1}
         className="h-full w-full scale-105 object-cover transition-opacity duration-1000"
         style={{ opacity }}
       />
