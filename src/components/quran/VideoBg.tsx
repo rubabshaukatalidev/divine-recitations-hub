@@ -1,12 +1,14 @@
-import { useEffect, useRef } from "react";
-import calligraphy from "@/assets/quran-calligraphy.mp4.asset.json";
-import particles from "@/assets/navy-particles.mp4.asset.json";
-import silk from "@/assets/navy-silk.mp4.asset.json";
+import { useEffect, useRef, useState } from "react";
 
+// Note: pehle ye .asset.json files se Lovable ke internal "/__l5e/" proxy path
+// use karti thi — jo sirf Lovable ke apne hosting par kaam karta hai. Vercel (ya
+// kisi bhi doosre static host) par woh path 404 deta hai, isliye background
+// videos ghayab thay. Ab hum directly hosted, license-free (Mixkit) video CDN
+// URLs use kar rahe hain jo kisi bhi host par kaam karte hain.
 export const BG_VIDEOS = {
-  calligraphy: calligraphy.url,
-  particles: particles.url,
-  silk: silk.url,
+  calligraphy: "https://assets.mixkit.co/videos/4312/4312-720.mp4",
+  particles: "https://assets.mixkit.co/videos/9736/9736-720.mp4",
+  silk: "https://assets.mixkit.co/videos/17255/17255-720.mp4",
 } as const;
 
 type Props = {
@@ -26,10 +28,14 @@ export function VideoBg({
   video = "calligraphy",
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Video jab tak load/play na ho jaye, opacity 0 rakhte hain taake ek
+  // smooth fade-in ho, achanak "pop" na ho.
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
+    setReady(false);
 
     // Mobile Safari/Chrome: muted DOM par set karna zaroori hai,
     // warna autoplay block ho jata hai.
@@ -39,7 +45,10 @@ export function VideoBg({
 
     const tryPlay = () => {
       const p = el.play();
-      if (p) p.catch(() => {/* autoplay blocked — next interaction par dobara try hoga */});
+      if (p)
+        p.then(() => setReady(true)).catch(() => {
+          /* autoplay blocked — next interaction par dobara try hoga */
+        });
     };
 
     if (el.readyState >= 2) tryPlay();
@@ -71,7 +80,10 @@ export function VideoBg({
   }, [video]);
 
   return (
-    <div className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`} aria-hidden>
+    <div
+      className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
+      aria-hidden
+    >
       <video
         key={video}
         ref={videoRef}
@@ -84,15 +96,15 @@ export function VideoBg({
         disablePictureInPicture
         controls={false}
         tabIndex={-1}
-        className="h-full w-full scale-105 object-cover transition-opacity duration-1000"
-        style={{ opacity }}
+        className="h-full w-full scale-105 object-cover [animation:slow-zoom_28s_ease-in-out_infinite_alternate] transition-opacity duration-[1400ms] ease-out"
+        style={{ opacity: ready ? opacity : 0 }}
       />
       <div
-        className={
+        className={`transition-opacity duration-[1400ms] ${
           overlay === "strong"
             ? "absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background"
             : "absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background/95"
-        }
+        }`}
       />
     </div>
   );
