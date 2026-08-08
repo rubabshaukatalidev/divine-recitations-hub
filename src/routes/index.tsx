@@ -17,10 +17,10 @@ export const Route = createFileRoute("/")({
         content:
           "Mashhoor Arab qurra ki khoobsurat awaz mein poori 114 surahon ki tilawat suniye — modern, responsive aur sukoon bhari Islamic website.",
       },
-      { property: "og:title", content: "Nur al-Quran — Tilawat-e-Quran Online" },
+      { property: "og:title", content: "Nur al-Quran — Tilawat-e-Quran Har Surah Ki Awaz Mein" },
       {
         property: "og:description",
-        content: "114 surahon ki tilawat, mashhoor Arab qurra ki awaz mein, ek khoobsurat Islamic website par.",
+        content: "Mashhoor Arab qurra ki khoobsurat awaz mein poori 114 surahon ki tilawat suniye — modern, responsive aur sukoon bhari Islamic website.",
       },
     ],
   }),

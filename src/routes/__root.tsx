@@ -80,6 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Nur al-Quran" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { title: "Nur al-Quran — Tilawat-e-Quran Har Surah Ki Awaz Mein" },
+      { property: "og:title", content: "Nur al-Quran — Tilawat-e-Quran Har Surah Ki Awaz Mein" },
+      { name: "twitter:title", content: "Nur al-Quran — Tilawat-e-Quran Har Surah Ki Awaz Mein" },
+      { name: "description", content: "Mashhoor Arab qurra ki khoobsurat awaz mein poori 114 surahon ki tilawat suniye — modern, responsive aur sukoon bhari Islamic website." },
+      { property: "og:description", content: "Mashhoor Arab qurra ki khoobsurat awaz mein poori 114 surahon ki tilawat suniye — modern, responsive aur sukoon bhari Islamic website." },
+      { name: "twitter:description", content: "Mashhoor Arab qurra ki khoobsurat awaz mein poori 114 surahon ki tilawat suniye — modern, responsive aur sukoon bhari Islamic website." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f4f66aaf57edb3552185fba34286d5ef/id-preview-f0be1205--78ad8adb-9638-4a88-914f-b25d11b964a7.lovable.app-1786163592049.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f4f66aaf57edb3552185fba34286d5ef/id-preview-f0be1205--78ad8adb-9638-4a88-914f-b25d11b964a7.lovable.app-1786163592049.png" },
     ],
     links: [
       {
