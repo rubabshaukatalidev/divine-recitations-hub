@@ -174,3 +174,23 @@
 * {
   scroll-behavior: smooth;
 }
+
+@keyframes slow-zoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
