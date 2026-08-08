@@ -1,157 +1,122 @@
-import { useEffect, useRef, useState } from "react";
-import { Pause, Play, SkipBack, SkipForward, Volume2, Repeat } from "lucide-react";
-import { audioUrl, type Surah } from "./data";
+import React, { useEffect, useRef, useState } from "react";
+import { Volume2, VolumeX, Play, Pause } from "lucide-react";
 
-const fmt = (s: number) => {
-  if (!Number.isFinite(s)) return "0:00";
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return `${m}:${sec.toString().padStart(2, "0")}`;
+// Global simple pub-sub audio bus so NasheedPlayer knows when Tilawat plays/pauses
+type AudioListener = (isPlaying: boolean) => void;
+const listeners = new Set<AudioListener>();
+
+export const notifyTilawatState = (isPlaying: boolean) => {
+  listeners.forEach((fn) => fn(isPlaying));
 };
 
-type Props = {
-  surah: Surah | null;
-  reciter: string;
-  reciterName: string;
-  onNext: () => void;
-  onPrev: () => void;
+export const subscribeTilawatState = (fn: AudioListener) => {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
 };
 
-export function AudioPlayer({ surah, reciter, reciterName, onNext, onPrev }: Props) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [time, setTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [loop, setLoop] = useState(false);
-  const [loading, setLoading] = useState(false);
+interface AudioPlayerProps {
+  src: string;
+  title?: string;
+  reciterName?: string;
+  onEnded?: () => void;
+}
+
+export const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  src,
+  title,
+  reciterName,
+  onEnded,
+}) => {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const el = audioRef.current;
-    if (!el || !surah) return;
-    setLoading(true);
-    el.load();
-    el.play()
-      .then(() => setPlaying(true))
-      .catch(() => setPlaying(false))
-      .finally(() => setLoading(false));
-  }, [surah?.number, reciter]);
+    const audio = audioRef.current;
+    if (!audio) return;
 
-  if (!surah) return null;
+    const handlePlay = () => {
+      setIsPlaying(true);
+      notifyTilawatState(true);
+    };
 
-  const toggle = () => {
-    const el = audioRef.current;
-    if (!el) return;
-    if (el.paused) {
-      el.play();
-      setPlaying(true);
+    const handlePause = () => {
+      setIsPlaying(false);
+      notifyTilawatState(false);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      notifyTilawatState(false);
+      if (onEnded) onEnded();
+    };
+
+    const handleTimeUpdate = () => {
+      if (audio.duration) {
+        setProgress((audio.currentTime / audio.duration) * 100);
+      }
+    };
+
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+
+    return () => {
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+    };
+  }, [onEnded]);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
     } else {
-      el.pause();
-      setPlaying(false);
+      audioRef.current.play();
     }
   };
 
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl gold-border bg-secondary font-arabic text-lg text-primary">
-            {surah.number}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-arabic text-xl leading-tight text-primary">{surah.name}</p>
-            <p className="truncate text-sm text-muted-foreground">
-              {surah.englishName} · {reciterName}
-            </p>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <button
-              onClick={onPrev}
-              aria-label="Pichli surah"
-              className="rounded-full p-2 text-muted-foreground transition-colors hover:text-primary"
-            >
-              <SkipBack className="h-5 w-5" />
-            </button>
-            <button
-              onClick={toggle}
-              aria-label={playing ? "Pause" : "Play"}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105 active:scale-95"
-            >
-              {loading ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-              ) : playing ? (
-                <Pause className="h-5 w-5" />
-              ) : (
-                <Play className="ml-0.5 h-5 w-5" />
-              )}
-            </button>
-            <button
-              onClick={onNext}
-              aria-label="Agli surah"
-              className="rounded-full p-2 text-muted-foreground transition-colors hover:text-primary"
-            >
-              <SkipForward className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setLoop((l) => !l)}
-              aria-label="Repeat"
-              className={`hidden rounded-full p-2 transition-colors sm:block ${
-                loop ? "text-primary" : "text-muted-foreground hover:text-primary"
-              }`}
-            >
-              <Repeat className="h-5 w-5" />
-            </button>
-            <div className="hidden items-center gap-2 pl-2 md:flex">
-              <Volume2 className="h-4 w-4 text-muted-foreground" />
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={volume}
-                aria-label="Volume"
-                onChange={(e) => {
-                  const v = Number(e.target.value);
-                  setVolume(v);
-                  if (audioRef.current) audioRef.current.volume = v;
-                }}
-                className="h-1 w-24 cursor-pointer appearance-none rounded-full bg-secondary accent-primary"
-              />
-            </div>
-          </div>
-        </div>
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    audioRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
 
-        <div className="flex items-center gap-3">
-          <span className="w-10 text-right text-[11px] tabular-nums text-muted-foreground">
-            {fmt(time)}
-          </span>
-          <input
-            type="range"
-            min={0}
-            max={duration || 0}
-            value={time}
-            aria-label="Seek"
-            onChange={(e) => {
-              const v = Number(e.target.value);
-              setTime(v);
-              if (audioRef.current) audioRef.current.currentTime = v;
-            }}
-            className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-secondary accent-primary"
+  return (
+    <div className="flex items-center gap-4 rounded-xl bg-background/60 p-4 backdrop-blur-md border border-white/10">
+      <audio ref={audioRef} src={src} preload="metadata" />
+      
+      <button
+        onClick={togglePlay}
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+      >
+        {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
+      </button>
+
+      <div className="flex-1">
+        {title && <h4 className="font-semibold text-foreground">{title}</h4>}
+        {reciterName && <p className="text-sm text-muted-foreground">{reciterName}</p>}
+        
+        <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full bg-emerald-500 transition-all duration-300"
+            style={{ width: `${progress}%` }}
           />
-          <span className="w-10 text-[11px] tabular-nums text-muted-foreground">
-            {fmt(duration)}
-          </span>
         </div>
       </div>
 
-      <audio
-        ref={audioRef}
-        loop={loop}
-        src={audioUrl(reciter, surah.number)}
-        onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-        onEnded={() => (loop ? null : onNext())}
-      />
+      <button
+        onClick={toggleMute}
+        className="text-muted-foreground hover:text-foreground transition-colors p-2"
+      >
+        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+      </button>
     </div>
   );
-}
+};
